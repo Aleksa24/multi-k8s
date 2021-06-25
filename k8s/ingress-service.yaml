@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-service
+  annotations: 
+  #pravi ingress controller na osnovi nginx implementacije
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    #radi revrite na request, izbacuje /api prenego sto se prosledi na server
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: client-cluster-ip-service
+                port:
+                  number: 3000
+          - path: /api/?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: server-cluster-ip-service
+                port:
+                  number: 5000
+
+
+
